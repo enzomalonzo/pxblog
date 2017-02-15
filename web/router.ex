@@ -11,12 +11,15 @@ defmodule Pxblog.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    #plug :scrub_params, "user" when action in [:create]
   end
 
   scope "/", Pxblog do
     pipe_through :browser # Use the default browser stack
 
     resources "/posts", PostController
+    resources "/users", UserController
+    resources "/sessions", SessionController, only: [:new, :create, :delete]
     get "/", PageController, :index
   end
 
