@@ -9,7 +9,8 @@ defmodule Pxblog.SessionController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    Repo.get_by(User, username: user_params["username"])
+    User
+    |> Repo.get_by(username: user_params["username"])
     |> sign_in(user_params["password"], conn)
   end
 
@@ -22,8 +23,8 @@ defmodule Pxblog.SessionController do
 
   defp sign_in(user, password, conn) when is_nil(user) do
     conn
-      |> put_flash(:error, "Invalid username/password combination!")
-      |> redirect(to: page_path(conn, :index))
+    |> put_flash(:error, "Invalid username/password combination!")
+    |> redirect(to: page_path(conn, :index))
   end
 
   defp sign_in(user, password, conn) do
