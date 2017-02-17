@@ -5,6 +5,8 @@ defmodule Pxblog.Post do
     field :title, :string
     field :body, :string
 
+    belongs_to :user, Pxblog.User
+
     timestamps()
   end
 
@@ -13,7 +15,7 @@ defmodule Pxblog.Post do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:title, :body])
+    |> cast(params, [:title, :body, :user_id])
     |> validate_required([:title, :body])
   end
 end
