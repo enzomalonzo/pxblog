@@ -4,9 +4,10 @@
 /deps
 /*.ez
 
-/*.exs
-**/*.exs
 **/*.swp
+**/*.exs
+**/*.ex
+**/*.gitignore
 # Generated on crash by the VM
 erl_crash.dump
 
