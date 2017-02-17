@@ -4,7 +4,8 @@ defmodule Pxblog.PostControllerTest do
   alias Pxblog.{
     Post,
     TestHelper,
-    Factory
+    Factory,
+    TestHelper
   }
 
   @valid_attrs %{body: "some content", title: "some content"}
