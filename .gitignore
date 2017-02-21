@@ -4,6 +4,7 @@
 /deps
 /*.ez
 
+**/*.swo
 **/*.swp
 **/*.exs
 **/*.ex
