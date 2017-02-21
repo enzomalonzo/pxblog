@@ -102,4 +102,55 @@ defmodule Pxblog.PostControllerTest do
     assert redirected_to(conn) == page_path(conn, :index)
     assert conn.halted
   end
+
+  test "redirects when trying to delete a post for a different user", %{conn: conn, role: role, post: post} do
+    other_user = TestHelper.create_user(role, %{email: "isa@isa.com", username: "isa", password: "password", password_confirmation: "password"})
+    conn = delete conn, user_post_path(conn, :delete, other_user, post)
+
+    assert get_flash(conn, :error) == "You are not authorized to modify that post!"
+    assert redirected_to(conn) == page_path(conn, :index)
+    assert conn.halted
+  end
+
+  test "renders form for editing chosen resource when logged in as admin", %{conn: conn, user: user, post: post} do
+    role = TestHelper.create_role(%{name: "juan", admin: true})
+    admin = TestHelper.create_user(role, %{email: "juan@juan.com", username: "juan", password: "password", password_confirmation: "password"})
+    conn = conn
+      |> login_user(admin)
+      |> put(user_post_path(conn, :update, user, post))
+
+    assert html_response(conn, 200) == "Edit post"
+  end
+
+  test "updates chosen resource and redirects when data is valid when logged in as admin", %{conn: conn, user: user, post: post} do
+    role = TestHelper.create_role(%{name: "juan", admin: true})
+    admin = TestHelper.create_user(role, %{email: "juan@juan.com", username: "juan", password: "password", password_confirmation: "password"})
+    conn = conn
+      |> login_user(admin)
+      |> put(user_post_path(conn, :update, user, post), post: @valid_attrs)
+
+    assert redirected_to(conn) == user_post_path(conn, :update, user, post)
+    assert Repo.get_by(Post, @valid_attrs)
+  end
+
+  test "does not update chosen resource and renders error when data is invalid when logged in as admin", %{conn: conn, user: user, post: post} do
+    role = TestHelper.create_role(%{name: "juan", admin: true})
+    admin = TestHelper.create_user(role, %{email: "juan@juan.com", username: "juan", password: "password", password_confirmation: "password"})
+    conn = conn
+      |> login_user(admin)
+      |> put(user_post_path(conn, :update, user, post), post: %{"body" => nil})
+
+    assert html_response(conn, 200) =~ "Edit post"
+  end
+
+  test "deletes chosen resource when logged in as admin", %{conn: conn, user: user, post: post} do
+    role = TestHelper.create_role(%{name: "juan", admin: true})
+    admin = TestHelper.create_user(role, %{email: "juan@juan.com", username: "juan", password: "password", password_confirmation: "password"})
+    conn = conn
+      |> login_user(admin)
+      |> delete(user_post_path(conn, :delete, user, post))
+
+    assert redirected_to(conn) == user_post_path(conn, :index, user)
+    refute Repo.get(Post, post.id)
+  end
 end
