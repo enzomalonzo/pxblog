@@ -15,7 +15,8 @@ defmodule Pxblog.PostControllerTest do
   end
 
   defp create_user do
-    User.changeset(%User{}, %{email: "test@test.com", username: "test", password: "test", password_confirmation: "test"})
+    %User{}
+    |> User.changeset(%{email: "test@test.com", username: "test", password: "test", password_confirmation: "test"})
     |> Repo.insert
   end
 
@@ -28,7 +29,7 @@ defmodule Pxblog.PostControllerTest do
       user
       |> build_assoc(:posts)
       |> Post.changeset(@valid_attrs)
-    Repo.insert!(changeset)
+      |> Repo.insert!(changeset)
   end
 
   test "lists all entries on index", %{conn: conn, user: user} do

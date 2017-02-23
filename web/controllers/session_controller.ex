@@ -13,8 +13,9 @@ defmodule Pxblog.SessionController do
 
   def create(conn, %{"user" => %{"username" => username, "password" => password}})
     when not is_nil(username) and not is_nil(password) do
-      user = User |> Repo.get_by(username: username)
-      sign_in(user, password, conn)
+      user = User
+             |> Repo.get_by(username: username)
+             |> sign_in(password, conn)
   end
 
   def create(conn, _) do
