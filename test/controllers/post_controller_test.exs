@@ -1,20 +1,20 @@
 defmodule Pxblog.PostControllerTest do
   use Pxblog.ConnCase
 
+  import Pxblog.Factory
+
   alias Pxblog.{
     Post,
     TestHelper,
-    Factory,
-    TestHelper
   }
 
   @valid_attrs %{body: "some content", title: "some content"}
   @invalid_attrs %{}
 
   setup do
-    role  = Factory.insert(:role)
-    user  = Factory.insert(:user, role: role)
-    post  = Factory.insert(:post, user: user)
+    role  = insert(:role)
+    user  = insert(:user, role: role)
+    post  = insert(:post, user: user)
 
     conn = build_conn() |> login_user(user)
     {:ok, conn: conn, user: user, role: role, post: post}
@@ -89,7 +89,7 @@ defmodule Pxblog.PostControllerTest do
 
   #TODO
   #test "redirects when the specified user does not exist", %{conn: conn} do
-    #conn = get conn, user_post_path(conn, :index, -1)
+    #conn = get conn, user_post_path(conn, :index, %Pxblog.User{id: 1111})
 
     #assert get_flash(conn, :error) == "Invalid user!"
     #assert redirected_to(conn) == page_path(conn, :index)

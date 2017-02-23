@@ -12,7 +12,7 @@
     <%= markdown(@post.body) %>
   </li>
 
-  <%= render Pxblog.CommentView, "form.html", changeset: @comment_changeset, action: user_post_comment_path(@conn, :create, @current_user, @post) %>
+  <%= render Pxblog.CommentView, "form.html", changeset: @comment_changeset, action: user_post_comment_path(@conn, :create, @user, @post) %>
 
   <div class="comments">
     <h2>Comments</h2>

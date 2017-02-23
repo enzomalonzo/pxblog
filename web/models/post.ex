@@ -26,7 +26,7 @@ defmodule Pxblog.Post do
   end
 
   defp strip_unsafe_body(model, %{"body" => body}) do
-    {:safe, clean_body} = Pheonix.HTML.html_escape(body)
+    {:safe, clean_body} = Phoenix.HTML.html_escape(body)
     model |> put_change(:body, clean_body)
   end
 
