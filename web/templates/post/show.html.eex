@@ -17,7 +17,10 @@
     <%= for comment <- @post.comments do %>
       <%= render Pxblog.CommentView,
         "comment.html",
-        comment: comment
+        comment: comment,
+        author_or_admin: @conn.assigns[:author_or_admin],
+        conn: @conn,
+        post: @post
       %>
     <% end %>
   </div>
