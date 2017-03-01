@@ -17,6 +17,8 @@ defmodule Pxblog.User do
     field :password_confirmation, :string, virtual: true
   end
 
+  #%User{} |> User.changeset(%{username: "enzo", password: "password", confirm_password: "password", role_id: 0}) |> Repo.insert!
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """

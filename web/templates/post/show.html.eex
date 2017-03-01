@@ -12,14 +12,17 @@
     <%= markdown(@post.body) %>
   </li>
 
-  <%= render Pxblog.CommentView, "form.html", changeset: @comment_changeset, action: user_post_comment_path(@conn, :create, @user, @post) %>
-
   <div class="comments">
     <h2>Comments</h2>
     <%= for comment <- @post.comments do %>
-      <%= render Pxblog.CommentView, "comment.html", comment: comment %>
+      <%= render Pxblog.CommentView,
+        "comment.html",
+        comment: comment
+      %>
     <% end %>
   </div>
+
+  <%= render Pxblog.CommentView, "form.html", changeset: @comment_changeset, action: user_post_comment_path(@conn, :create, @user, @post) %>
 </ul>
 
 <%= link "Edit", to: user_post_path(@conn, :edit, @user, @post) %>
