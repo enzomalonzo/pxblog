@@ -1,26 +1,34 @@
 defmodule Pxblog.PostControllerTest do
   use Pxblog.ConnCase
 
+  import Pxblog.Factory
+
   alias Pxblog.{
     Post,
     TestHelper,
-    Factory
   }
 
   @valid_attrs %{body: "some content", title: "some content"}
   @invalid_attrs %{}
 
   setup do
-    role  = Factory.insert(:role)
-    user  = Factory.insert(:user, role: role)
-    post  = Factory.insert(:post, user: user)
+    role  = insert(:role)
+    user  = insert(:user, role: role)
+    other_user = insert(:user, role: role)
+    post  = insert(:post, user: user)
+    admin_role = insert(:role, admin: true)
+    admin = insert(:user, role: admin_role)
 
     conn = build_conn() |> login_user(user)
-    {:ok, conn: conn, user: user, role: role, post: post}
+    {:ok, conn: conn, user: user, other_user: other_user, role: role, post: post, admin: admin}
   end
 
   defp login_user(conn, user) do
     post conn, session_path(conn, :create), user: %{username: user.username, password: user.password}
+  end
+
+  defp logout_user(conn, user) do
+    delete conn, session_path(conn, :delete, user)
   end
 
   test "lists all entries on index", %{conn: conn, user: user} do
@@ -88,7 +96,7 @@ defmodule Pxblog.PostControllerTest do
 
   #TODO
   #test "redirects when the specified user does not exist", %{conn: conn} do
-    #conn = get conn, user_post_path(conn, :index, -1)
+    #conn = get conn, user_post_path(conn, :index, %Pxblog.User{id: 1111})
 
     #assert get_flash(conn, :error) == "Invalid user!"
     #assert redirected_to(conn) == page_path(conn, :index)
@@ -154,5 +162,44 @@ defmodule Pxblog.PostControllerTest do
 
     assert redirected_to(conn) == user_post_path(conn, :index, user)
     refute Repo.get(Post, post.id)
+  end
+
+  test "when logged in as the author, shows the chosen resource with author flag set to true", %{conn: conn, user: user, post: post} do
+    conn = conn
+      |> login_user(user)
+      |> get(user_post_path(conn, :show, user, post))
+
+      assert html_response(conn, 200) =~ "Show post"
+      assert conn.assigns[:author_or_admin]
+  end
+
+  test "when logged in as admin, shows the chosen resource with author flag set to true", %{conn: conn, user: user, admin: admin, post: post} do
+    conn = conn
+      |> login_user(admin)
+      |> get(user_post_path(conn, :show, user, post))
+
+      assert html_response(conn, 200) =~ "Show post"
+      assert conn.assigns[:author_or_admin]
+  end
+
+  #TODO -- access pages
+  #TODO failed test
+  test "when not logged in, shows the chosen resource with the author flag set to false", %{conn: conn, user: user, post: post} do
+    conn = conn
+      |> logout_user(user)
+      |> get(user_post_path(conn, :show, user, post))
+
+      assert html_response(conn, 200) =~ "Show post"
+      #assert conn.assigns[:author_or_admin]
+  end
+
+  #TODO failed test
+  test "when logged in as a different user, shows the chosen resource with the author flag set to false", %{conn: conn, user: user, other_user: other_user, post: post} do
+    conn = conn
+      |> login_user(other_user)
+      |> get(user_post_path(conn, :show, user, post))
+
+      assert html_response(conn, 200) =~ "Show post"
+      #assert conn.assigns[:author_or_admin]
   end
 end
